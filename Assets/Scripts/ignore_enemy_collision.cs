@@ -34,5 +34,19 @@ public class ignore_enemy_collision : MonoBehaviour
             }
             
         }
+        foreach (var x in all_turrets)
+        {
+            foreach (var y in all_rats)
+            {
+                Physics2D.IgnoreCollision(x.GetComponent<Collider2D>(), y.GetComponent<Collider2D>());
+            }
+        }
+        foreach (var x in all_turrets)
+        {
+            foreach (var y in all_pirates)
+            {
+                Physics2D.IgnoreCollision(x.GetComponent<Collider2D>(), y.GetComponent<Collider2D>());
+            }
+        }
     }
 }

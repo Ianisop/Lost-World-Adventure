@@ -44,10 +44,14 @@ public class knifeHitBox : MonoBehaviour
         }
         if (collision.CompareTag("turret"))
         {
+            Debug.Log("hit the turret");
             enemy_srs = collision.GetComponentInParent<stationary_enemy_ai>().srs;
-            enemy_sr.color = hit_color;
+            foreach (var x in enemy_srs)
+            {
+                x.color = hit_color;
+            }
             Invoke("ResetSpritesColor", 0.1f);
-            collision.gameObject.GetComponentInParent<Enemy_Health>().health -= 100;
+            collision.gameObject.GetComponentInParent<Enemy_Health>().health -= 35;
 
         }
     }
