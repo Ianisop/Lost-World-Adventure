@@ -10,20 +10,22 @@ public class AnimationMachine : MonoBehaviour
     public PlayerMovement player_movement;
     public SpriteRenderer[] sr;
     public Transform[] transforms;
+    public PlayerControlManager control;
     void Start()
     {
         sr = GetComponentsInChildren<SpriteRenderer>();
         transforms = GetComponentsInChildren<Transform>();
+        control = PlayerControlManager.instance;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (player_movement.velocity.x < 0)
+        if (control.MoveDir.x < 0)
         {
             gameObject.transform.localScale = new Vector2(-1, gameObject.transform.localScale.y);
         }
-        if (player_movement.velocity.x > 0)
+        if (control.MoveDir.x > 0)
         {
             gameObject.transform.localScale = new Vector2(1, gameObject.transform.localScale.y);
         }
