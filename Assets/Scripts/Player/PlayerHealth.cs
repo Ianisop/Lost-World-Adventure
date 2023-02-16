@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour
 {
     
-    public int playerHealth;
-    public int maxHealth;
+    public float playerHealth;
+    public float maxHealth;
     public static PlayerHealth Instance;
     public GameObject heartPrefab;
     public List<HeartsDisplay> hearts = new List<HeartsDisplay>();
@@ -34,19 +34,19 @@ public class PlayerHealth : MonoBehaviour
 
 
     //methods to handle the value of the player's health
-    public void setHealth(int value)
+    public void setHealth(float value)
     {
         playerHealth = value;
         CreateHearts();
     }
-    public void setMaxHealth(int newMaxHealth)
+    public void setMaxHealth(float newMaxHealth)
     {
         maxHealth = newMaxHealth;
         CreateHearts();
     }
-    public void heal(int healAmount)
+    public void heal(float healAmount)
     {
-        int temp = playerHealth + healAmount; 
+        float temp = playerHealth + healAmount; 
         if(temp > maxHealth)
             playerHealth = maxHealth;
         else
@@ -54,7 +54,7 @@ public class PlayerHealth : MonoBehaviour
         
         CreateHearts();
     }
-    public void TakeDamage(int damageTaken)
+    public void TakeDamage(float damageTaken)
     {
         playerHealth-= damageTaken;
         foreach(var x in player_global_vars.Instance.srs)

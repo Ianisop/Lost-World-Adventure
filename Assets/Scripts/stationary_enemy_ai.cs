@@ -16,6 +16,7 @@ public class stationary_enemy_ai : MonoBehaviour
     private Vector2 direction;
     private float angle;
     public SpriteRenderer[] srs;
+    public float distance;
 
 
     void Awake()
@@ -34,6 +35,21 @@ public class stationary_enemy_ai : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        distance = Vector2.Distance(transform.position, player.transform.position);
+        Vector3 direction = player.transform.position - transform.position;
+        direction.Normalize();
+
+        if ((transform.position.x > player.transform.position.x))
+        {
+            transform.localScale = new Vector2(-1, transform.localScale.y);
+        }
+        else
+        {
+            transform.localScale = new Vector2(1, transform.localScale.y);
+        }
+
+
         // calculate the angle between the spawner and the player
         direction = (player.transform.position - transform.position).normalized;
         angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -41,7 +57,7 @@ public class stationary_enemy_ai : MonoBehaviour
 
     public IEnumerator StartShooting()
     {
-        if (attack)
+        if (attack && player_global_vars.Instance.stealthed == false)
         {
             yield return SpawnProjectiles();
             yield return new WaitForSeconds(2);

@@ -631,6 +631,7 @@ MonoBehaviour:
   numProjectiles: 400
   delayBetweenProjectiles: 2
   srs: []
+  distance: 0
 --- !u!1 &8600295715665262200
 GameObject:
   m_ObjectHideFlags: 0
