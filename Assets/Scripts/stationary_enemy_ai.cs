@@ -37,8 +37,8 @@ public class stationary_enemy_ai : MonoBehaviour
     {
 
         distance = Vector2.Distance(transform.position, player.transform.position);
-        Vector3 direction = player.transform.position - transform.position;
-        direction.Normalize();
+        Vector3 directions = player.transform.position - transform.position;
+        directions.Normalize();
 
         if ((transform.position.x > player.transform.position.x))
         {
@@ -49,10 +49,11 @@ public class stationary_enemy_ai : MonoBehaviour
             transform.localScale = new Vector2(1, transform.localScale.y);
         }
 
-
+        
         // calculate the angle between the spawner and the player
         direction = (player.transform.position - transform.position).normalized;
         angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Debug.Log(angle);
     }
 
     public IEnumerator StartShooting()
@@ -65,13 +66,11 @@ public class stationary_enemy_ai : MonoBehaviour
     }
 
     public IEnumerator SpawnProjectiles()
-    {
+    { 
 
-
-        // spawn the projectiles in a burst
         for (int i = 0; i < numProjectiles; i++)
         {
-            GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.Euler(0, 0, angle));
+            GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.Euler(0, angle, 0));
             Rigidbody2D projectileRigidbody = projectile.GetComponent<Rigidbody2D>();
             projectileRigidbody.velocity = direction * 10f; // adjust the velocity to control the speed of the projectiles
 
