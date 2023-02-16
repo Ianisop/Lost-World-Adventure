@@ -135,6 +135,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] TileChecker groundChecker;
     [SerializeField] TileChecker ceilingChecker;
     [SerializeField] TileChecker wallChecker;
+    [SerializeField] TileChecker ledgeChecker;
 
     // ===== Game Jam Specific, remove all game jam =====
     public float overrideMaxSpeed;
@@ -196,6 +197,7 @@ public class PlayerMovement : MonoBehaviour
         groundChecker.OnHitTile += OnHitGround;
         wallChecker.OnHitTile += OnClimbWall;
         wallChecker.OnExitTile += OnLeaveWall;
+        ledgeChecker.OnExitTile += OnAtLedge;
     }
 
     private void OnDisable()
@@ -203,6 +205,7 @@ public class PlayerMovement : MonoBehaviour
         groundChecker.OnHitTile -= OnHitGround;
         wallChecker.OnHitTile -= OnClimbWall;
         wallChecker.OnExitTile -= OnLeaveWall;
+        ledgeChecker.OnExitTile -= OnAtLedge;
     }
 
     private void Awake()
@@ -221,6 +224,8 @@ public class PlayerMovement : MonoBehaviour
 
         controls = PlayerControlManager.instance;
         controls.OnDash += OnDash;
+        controls.OnClimb += OnClimbWall;
+        controls.OnClimbReleased += OnClimbReleased;
 
         MovementType.Clone(currMovementType, walking);
     }
@@ -393,18 +398,26 @@ public class PlayerMovement : MonoBehaviour
     {
         float fallingOffWallSpeed = 5f;
 
-        // If moving opposite direction of wall,
-        if (isLastFacingDirLeft && input.x > 0f) // If wall on right and moving left
+        if (controls.IsJumping)
         {
+            OnLeaveWall();
+            ifClampHorizontalSpeed = false;
+            velocity.x = fallingOffWallSpeed * 5f;
+            velocity.y = fallingOffWallSpeed * 10f;
+            return;
+        }
+        // If moving opposite direction of wall,
+        else if (isLastFacingDirLeft && input.x > 0f) // If wall on right and moving left
+        {
+            OnLeaveWall();
             ifClampHorizontalSpeed = false;
             velocity.x = fallingOffWallSpeed;
-            OnLeaveWall();
         }
         else if (!isLastFacingDirLeft && input.x < 0f) // If wall on right and moving left
         {
-            ifClampHorizontalSpeed = false;
-            velocity.x = -fallingOffWallSpeed;
             OnLeaveWall();
+            velocity.x = -fallingOffWallSpeed;
+            ifClampHorizontalSpeed = false;
         }
 
         // Slow down the player if not pressing any buttons
@@ -441,14 +454,45 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnClimbWall()
     {
+        if (!controls.IsClimbing || !wallChecker.IsTouchingTile)
+            return;
+
         velocity.x = 0f;
+        ledgeChecker.gameObject.SetActive(true);
         SetMovementType(climbingMovement, false);
+
+    }
+
+    private void OnClimbWall(InputAction.CallbackContext context)
+    {
+        OnClimbWall();
     }
 
     private void OnLeaveWall()
     {
         velocity.y = 0;
+        ledgeChecker.gameObject.SetActive(false);
         SetMovementType(walking, false);
+    }
+
+    private void OnClimbReleased(InputAction.CallbackContext context)
+    {
+        if (currMovementType.type != MovementType.Type.CLIMBING) 
+            return;
+
+        OnLeaveWall();
+    }
+    
+    private void OnAtLedge()
+    {
+        OnLeaveWall();
+
+        if (Physics2D.Raycast(ledgeChecker.transform.position, Vector2.left))
+            velocity.x = -5f;
+        else
+            velocity.x = 5f;
+
+        velocity.y = 35f;
     }
 
     private void OnHitGround()
