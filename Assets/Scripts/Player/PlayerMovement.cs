@@ -223,7 +223,7 @@ public class PlayerMovement : MonoBehaviour
         lastDashedTime = float.MinValue;
 
         controls = PlayerControlManager.instance;
-        controls.OnDash += OnDash;
+        //controls.OnDash += OnDash;
         controls.OnClimb += OnClimbWall;
         controls.OnClimbReleased += OnClimbReleased;
 
@@ -244,7 +244,6 @@ public class PlayerMovement : MonoBehaviour
         {
             ClimbingMovement(inputDir);
         }
-
 
         rb.velocity = Vector2.zero;
         rb.MovePosition(rb.position + velocity * Time.deltaTime);
@@ -396,6 +395,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ClimbingMovement(Vector2 input)
     {
+        // TODO: Don't hard code the values
         float fallingOffWallSpeed = 5f;
 
         if (controls.IsJumping)
@@ -442,14 +442,20 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // ========== Events ==========
+
+    public void StartDash()
+    {
+        SetMovementType(dashMovement, false);
+        lastDashedTime = Time.timeSinceLevelLoad;
+    }
+
     private void OnDash(InputAction.CallbackContext context)
     {
         // If player press dash and cooldown is over
         if (Time.timeSinceLevelLoad - lastDashedTime < dashCooldown)
             return;
 
-        SetMovementType(dashMovement, false);
-        lastDashedTime = Time.timeSinceLevelLoad;
+        StartDash();
     }
 
     private void OnClimbWall()
@@ -485,6 +491,7 @@ public class PlayerMovement : MonoBehaviour
     
     private void OnAtLedge()
     {
+        // TODO: Don't hard code the values
         OnLeaveWall();
 
         if (Physics2D.Raycast(ledgeChecker.transform.position, Vector2.left))

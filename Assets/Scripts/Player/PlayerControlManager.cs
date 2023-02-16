@@ -25,7 +25,7 @@ public class PlayerControlManager : MonoBehaviour
     [field: SerializeField] public Vector2 MoveDir { get; private set; }
     [field: SerializeField] public bool IsJumping { get; private set; }
     [field: SerializeField] public bool IsSprinting { get; private set; }
-    [field: SerializeField] public bool IsClimbing { get { return climb.phase == InputActionPhase.Performed; } }
+    public bool IsClimbing { get { return climb.phase == InputActionPhase.Performed; } }
     [field: SerializeField] public bool IsInteracting { get; private set; }
     [field: SerializeField] public bool IsOpeningInventory { get; private set; }
     [field: SerializeField] public bool IsUsingPrimaryAttack { get; private set; }
