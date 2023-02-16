@@ -9,17 +9,7 @@ public class knifeHitBox : MonoBehaviour
     private SpriteRenderer[] enemy_srs;
     private Color originalColor;
     private Color hit_color = new Color(229, 0, 0);
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    
     void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.CompareTag("Enemy"))
@@ -31,7 +21,11 @@ public class knifeHitBox : MonoBehaviour
                 x.color = hit_color;
             }
             Invoke("ResetSpritesColor", 0.1f);
-            collision.gameObject.GetComponent<Enemy_Health>().health -= 35;
+
+            if(player_global_vars.Instance.is_boosted == true)
+                collision.gameObject.GetComponent<Enemy_Health>().health -= 2;
+            else
+                collision.gameObject.GetComponent<Enemy_Health>().health -= 1;
             
         }
         if (collision.CompareTag("rat"))
@@ -39,7 +33,10 @@ public class knifeHitBox : MonoBehaviour
             enemy_sr = collision.gameObject.GetComponentInParent<SpriteRenderer>();
             enemy_sr.color = hit_color;
             Invoke("ResetSpriteColor", 0.1f);
-            collision.gameObject.GetComponentInParent<Enemy_Health>().health -= 100;
+            if(player_global_vars.Instance.is_boosted == true)
+                collision.gameObject.GetComponent<Enemy_Health>().health -= 2;
+            else
+                collision.gameObject.GetComponent<Enemy_Health>().health -= 1;
 
         }
         if (collision.CompareTag("turret"))
@@ -51,7 +48,10 @@ public class knifeHitBox : MonoBehaviour
                 x.color = hit_color;
             }
             Invoke("ResetSpritesColor", 0.1f);
-            collision.gameObject.GetComponentInParent<Enemy_Health>().health -= 35;
+            if(player_global_vars.Instance.is_boosted == true)
+                collision.gameObject.GetComponent<Enemy_Health>().health -= 2;
+            else
+                collision.gameObject.GetComponent<Enemy_Health>().health -= 1;
 
         }
     }

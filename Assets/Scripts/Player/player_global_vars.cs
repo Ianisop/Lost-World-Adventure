@@ -7,6 +7,7 @@ public class player_global_vars : MonoBehaviour
     // Start is called before the first frame update
     public static player_global_vars Instance;
     public bool stealthed = false;
+    public bool is_boosted = false; //added this variable so we can check if the strong attack passive is active
     public SpriteRenderer[] srs;
     public Color hit_color = new Color(229, 0, 0);
 

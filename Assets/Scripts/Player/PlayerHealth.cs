@@ -17,7 +17,6 @@ public class PlayerHealth : MonoBehaviour
         Instance = this;
     }
 
-
     void Start()
     {
         setMaxHealth(maxHealth);

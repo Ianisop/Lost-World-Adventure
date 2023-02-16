@@ -10,12 +10,14 @@ public class AbilityManager : MonoBehaviour
 {
     public class Ability
     {
+        public string abilityName;
         public float damage;
         public float cooldown;
         public event Action OnUse;
         //public static event onuse OnUse;
-        public Ability(float dmg, float cd, Action onuse)
+        public Ability(string name,float dmg, float cd, Action onuse)
         {
+            abilityName = name;
             damage = dmg;
             cooldown = cd;
             OnUse = onuse;
@@ -54,6 +56,7 @@ public class AbilityManager : MonoBehaviour
     public PlayerMovement player_movement;
     public GameObject player;
     public Rigidbody2D r;
+     public Animator playerAnim;
     public SpriteRenderer[] srs;
 
     private void Awake()
@@ -68,13 +71,14 @@ public class AbilityManager : MonoBehaviour
         
 
         //define all abilities
-        Ability fireTiger = new Ability(40f, 15f, fireTigerAction);
-        Ability InvChameleon = new Ability(40f, 20f, InvChameleonAction);
-        Ability vineWhip = new Ability(40f, 2f, vineWhipAction);
+        Ability fireTiger = new Ability("Fire Tiger",2f, 15f, fireTigerAction);
+        Ability InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
+        Ability vineWhip = new Ability("Vine Whip",2f, 2f, vineWhipAction);
+        Ability strongAttack = new Ability ("Strong Attack", 3f, 5f, strongAttackAction );
 
         current_ability_1 = vineWhip;
         current_ability_2 = InvChameleon;
-        current_ability_3 = vineWhip;
+        current_ability_3 = strongAttack;
         Debug.Log("Current Abilities: " + current_ability_1 + ", " + current_ability_2 + ", " + current_ability_3);
     }
 
@@ -115,10 +119,6 @@ public class AbilityManager : MonoBehaviour
 
     }
 
-
-
-
-
     IEnumerator Haptic(Image img)
     {
         img.rectTransform.sizeDelta = new Vector2(60, 70);
@@ -146,6 +146,29 @@ public class AbilityManager : MonoBehaviour
 
 
     }
+        //still a work in progress
+    void strongAttackAction()
+    {
+        //playerAnim.SetBool("is_attacking", true);
+        //Start Passive buff
+        player_global_vars.Instance.is_boosted = true;
+        Debug.Log("Knife Attacks are now boosted");
+
+        //Just something to visualize the passive buff
+        foreach(var x in srs)
+        {
+            if(x.sprite.name == "test_6" || x.sprite.name == "test_9" || x.sprite.name == "test_10")
+             x.color = Color.blue;
+        }
+        //reference with animator
+        //to do attack animation
+
+        //then check the hit box 
+
+        //if hit 
+        //deal 3 dmg to enemies
+    
+    }
 
     IEnumerator stealth()
     {
@@ -171,4 +194,15 @@ public class AbilityManager : MonoBehaviour
         player_global_vars.Instance.stealthed = false;
 
     }
+
+    public List<Ability> getCurrentAbilities()
+    {
+        List<Ability> abilities = new List<Ability>();
+        abilities.Add(current_ability_1);
+        abilities.Add(current_ability_2);
+        abilities.Add(current_ability_3);
+
+        return abilities;
+    }
+
 }
