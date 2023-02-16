@@ -20,18 +20,9 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
-        CreateHearts();
         setMaxHealth(maxHealth);
         setHealth(maxHealth);
     }
-    public void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            TakeDamage(1);
-        }
-    }
-
 
     //methods to handle the value of the player's health
     public void setHealth(float value)
