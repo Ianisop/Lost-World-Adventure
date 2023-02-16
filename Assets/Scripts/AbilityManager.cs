@@ -15,7 +15,7 @@ public class AbilityManager : MonoBehaviour
         public float cooldown;
         public event Action OnUse;
         //public static event onuse OnUse;
-        public Ability(string name,float dmg, float cd, Action onuse)
+        public Ability(string name, float dmg, float cd, Action onuse)
         {
             abilityName = name;
             damage = dmg;
@@ -50,6 +50,10 @@ public class AbilityManager : MonoBehaviour
     private Ability current_ability_1;
     private Ability current_ability_2;
     private Ability current_ability_3;
+    public Ability healing;
+    public Ability dash;
+    public Ability strongAttack;
+    public Ability InvChameleon;
 
     //others
     public SpriteRenderer sr;
@@ -69,16 +73,18 @@ public class AbilityManager : MonoBehaviour
         //get compoenents
         player = GameObject.FindGameObjectWithTag("player");
         
+        
 
         //define all abilities
-        Ability fireTiger = new Ability("Fire Tiger",2f, 15f, fireTigerAction);
-        Ability InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
-        Ability vineWhip = new Ability("Vine Whip",2f, 2f, vineWhipAction);
-        Ability strongAttack = new Ability ("Strong Attack", 3f, 5f, strongAttackAction );
+        InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
+        dash = new Ability("dash", 0f, 10f, dashAction);
+        strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
+        healing = new Ability("Healing", 0f, 40f, healingAction);
 
-        current_ability_1 = vineWhip;
-        current_ability_2 = InvChameleon;
+        current_ability_1 = InvChameleon;
+        current_ability_2 = dash;
         current_ability_3 = strongAttack;
+
         Debug.Log("Current Abilities: " + current_ability_1 + ", " + current_ability_2 + ", " + current_ability_3);
     }
 
@@ -128,11 +134,10 @@ public class AbilityManager : MonoBehaviour
 
 
 
-    //why isnt any of this shit working bruh it worked before i closed the project what the actual fuck
-    void fireTigerAction()
+
+    void healingAction()
     {
-        //for when movement code is done: make attack range and attack damage higher whilst this is active
-        Debug.Log("Firetiger!");
+        PlayerHealth.Instance.heal(2);
     }
 
     void InvChameleonAction()
@@ -140,39 +145,24 @@ public class AbilityManager : MonoBehaviour
         StartCoroutine(stealth());
     }
 
-    void vineWhipAction()
+    void dashAction()
     {
-
+        player_movement.StartDash();
 
 
     }
         //still a work in progress
     void strongAttackAction()
     {
-        //playerAnim.SetBool("is_attacking", true);
-        //Start Passive buff
-        player_global_vars.Instance.is_boosted = true;
-        Debug.Log("Knife Attacks are now boosted");
+        StartCoroutine(strong());
 
-        //Just something to visualize the passive buff
-        foreach(var x in srs)
-        {
-            if(x.sprite.name == "test_6" || x.sprite.name == "test_9" || x.sprite.name == "test_10")
-             x.color = Color.blue;
-        }
-        //reference with animator
-        //to do attack animation
-
-        //then check the hit box 
-
-        //if hit 
-        //deal 3 dmg to enemies
     
     }
 
     IEnumerator stealth()
     {
         player_global_vars.Instance.stealthed = true;
+        
         Debug.Log("startign stealth");
         Color initialColor;
         initialColor = sr.color;
@@ -188,10 +178,31 @@ public class AbilityManager : MonoBehaviour
         {
             x.color = initialColor;
             player_movement.ifOverrideMaxSpeed = false;
-            //player_movement.overrideMaxSpeed = 9;
+            player_movement.overrideMaxSpeed = 9;
 
         }
         player_global_vars.Instance.stealthed = false;
+
+    }
+    IEnumerator strong()
+    {
+        //Start Passive buff
+        player_global_vars.Instance.is_boosted = true;
+        Debug.Log("Knife Attacks are now boosted");
+
+        //Just something to visualize the passive buff
+        foreach (var x in srs)
+        {
+            if (x.sprite.name == "test_6" || x.sprite.name == "test_9" || x.sprite.name == "test_10")
+                x.color = Color.blue;
+        }
+        yield return new WaitForSeconds(5f);
+        foreach (var x in srs)
+        {
+            if (x.sprite.name == "test_6" || x.sprite.name == "test_9" || x.sprite.name == "test_10")
+                x.color = Color.white;
+        }
+        player_global_vars.Instance.is_boosted = false;
 
     }
 

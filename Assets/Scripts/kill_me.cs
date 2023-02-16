@@ -6,7 +6,7 @@ public class kill_me : MonoBehaviour
 {
     // Start is called before the first frame update
     public static kill_me Instance;
-    public float damage = 0.5f;
+    public float damage;
 
 
     private void Awake()
@@ -33,7 +33,7 @@ public class kill_me : MonoBehaviour
     {
         if(collision.CompareTag("player"))
         {
-            PlayerHealth.Instance.TakeDamage(0.5f);
+            PlayerHealth.Instance.TakeDamage(damage);
         }
     }
 }

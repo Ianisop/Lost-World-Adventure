@@ -13,7 +13,7 @@ public class DamageSkills : MonoBehaviour
 
      private void OnTriggerEnter2D(Collider2D collision)
     {
-        List<Ability> abilities = abilityManager.getCurrentAbilities();
+        List<AbilityManager.Ability> abilities = abilityManager.getCurrentAbilities();
         float skillDmg = 3;
         foreach (var ability in abilities)
         {

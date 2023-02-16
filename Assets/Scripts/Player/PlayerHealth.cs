@@ -23,6 +23,15 @@ public class PlayerHealth : MonoBehaviour
         setHealth(maxHealth);
     }
 
+    void Update()
+    {
+        if(playerHealth <= 0)
+        {
+            Time.timeScale = 0;
+            Destroy(gameObject);
+        }
+    }
+
     //methods to handle the value of the player's health
     public void setHealth(float value)
     {
@@ -46,7 +55,16 @@ public class PlayerHealth : MonoBehaviour
     }
     public void TakeDamage(float damageTaken)
     {
-        playerHealth-= damageTaken;
+        List<AbilityManager.Ability> abilities = AbilityManager.Instance.getCurrentAbilities();
+        if(abilities.Contains(AbilityManager.Instance.healing))
+        {
+            playerHealth -= (damageTaken - 1);
+        }
+        else
+        {
+            playerHealth -= damageTaken;
+        }
+        
         foreach(var x in player_global_vars.Instance.srs)
         {
             x.color = player_global_vars.Instance.hit_color;

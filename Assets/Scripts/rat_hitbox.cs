@@ -26,7 +26,7 @@ public class rat_hitbox : MonoBehaviour
     {
         if (other.CompareTag("player"))
         {
-            InvokeRepeating("damagePlayer", 0f, 1);
+            InvokeRepeating("damagePlayer", 0f, 2);
         }
 
 
