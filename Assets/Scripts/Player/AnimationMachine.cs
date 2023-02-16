@@ -19,11 +19,11 @@ public class AnimationMachine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.A))
+        if (player_movement.velocity.x < 0)
         {
             gameObject.transform.localScale = new Vector2(-1, gameObject.transform.localScale.y);
         }
-        if (Input.GetKeyDown(KeyCode.D))
+        if (player_movement.velocity.x > 0)
         {
             gameObject.transform.localScale = new Vector2(1, gameObject.transform.localScale.y);
         }

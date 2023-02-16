@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 // Can be used to check what type the tile it is, then change vfx / sound / physics based on it (E.g. grass vs ice vs sand, etc)
 public class TileChecker : MonoBehaviour
@@ -23,11 +24,18 @@ public class TileChecker : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        OnHitTile?.Invoke();
+        if (IsLayerInMask(collision.gameObject.layer))
+            OnHitTile?.Invoke();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        OnExitTile?.Invoke();
+        if (IsLayerInMask(collision.gameObject.layer))
+            OnExitTile?.Invoke();
+    }
+
+    private bool IsLayerInMask(int layer)
+    {
+        return (LayerMask & (1 << layer)) != 0;
     }
 }

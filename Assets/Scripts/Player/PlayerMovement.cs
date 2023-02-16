@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,11 +12,12 @@ public class PlayerMovement : MonoBehaviour
     class MovementType
     {
         // For now is just helping for debugging
-        public enum Type 
+        public enum Type
         {
             WALKING,
             SPRINTING,
             DASHING,
+            CLIMBING,
             OTHERS, // Shouldn't have
         }
 
@@ -40,7 +43,6 @@ public class PlayerMovement : MonoBehaviour
         // Modifies an existing object to prevent recreating a new object everytime need to lerp
         public void Lerp(MovementType initialValue, MovementType targetValue, float t)
         {
-            print($"{initialValue.maxSpeed}   |   {targetValue.maxSpeed}   |  T: " + t);
             maxSpeed = Mathf.Lerp(initialValue.maxSpeed, targetValue.maxSpeed, t);
             airStrafeMaxSpeed = Mathf.Lerp(initialValue.airStrafeMaxSpeed, targetValue.airStrafeMaxSpeed, t);
             maxSpeedTime = Mathf.Lerp(initialValue.maxSpeedTime, targetValue.maxSpeedTime, t);
@@ -89,6 +91,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] MovementType walking;
     [SerializeField] MovementType sprintMovement;
     [SerializeField] MovementType dashMovement;
+    [SerializeField] MovementType climbingMovement;
 
     [SerializeField] float dashDuration;
     [SerializeField] float dashCooldown;
@@ -131,6 +134,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] TileChecker groundChecker;
     [SerializeField] TileChecker ceilingChecker;
+    [SerializeField] TileChecker wallChecker;
 
     // ===== Game Jam Specific, remove all game jam =====
     public float overrideMaxSpeed;
@@ -144,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
 
     // Variables to track the state of the player's movement and input
     [Header("Tracking Variables")]
-    
+
     [SerializeField]
     [ReadOnly]
     MovementType targetMovementType;
@@ -162,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
     // TODO: Change when animation is applied
     [SerializeField]
     [ReadOnly]
-    bool isLastFacingDirLeft; 
+    bool isLastFacingDirLeft;
 
     [SerializeField]
     [ReadOnly]
@@ -181,6 +185,25 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     [ReadOnly]
     bool ifReleaseJumpAfterJumping;
+
+    // Used to not clamp speed for some time, e.g. from jumping off a wall until landing
+    [SerializeField]
+    [ReadOnly]
+    bool ifClampHorizontalSpeed = true;
+
+    private void OnEnable()
+    {
+        groundChecker.OnHitTile += OnHitGround;
+        wallChecker.OnHitTile += OnClimbWall;
+        wallChecker.OnExitTile += OnLeaveWall;
+    }
+
+    private void OnDisable()
+    {
+        groundChecker.OnHitTile -= OnHitGround;
+        wallChecker.OnHitTile -= OnClimbWall;
+        wallChecker.OnExitTile -= OnLeaveWall;
+    }
 
     private void Awake()
     {
@@ -207,8 +230,16 @@ public class PlayerMovement : MonoBehaviour
         Vector2 inputDir = controls.MoveDir;
 
         UpdateMovementTypeState();
-        HorizontalMovement(inputDir.x);
-        VerticalMovement(inputDir.y);
+        if (currMovementType.type != MovementType.Type.CLIMBING)
+        {
+            HorizontalMovement(inputDir.x);
+            VerticalMovement(inputDir.y);
+        }
+        else
+        {
+            ClimbingMovement(inputDir);
+        }
+
 
         rb.velocity = Vector2.zero;
         rb.MovePosition(rb.position + velocity * Time.deltaTime);
@@ -217,6 +248,9 @@ public class PlayerMovement : MonoBehaviour
     // ========== Custom Functions ==========
     private void UpdateMovementTypeState()
     {
+        if (currMovementType.type == MovementType.Type.CLIMBING)
+            return;
+
         if (Time.time - lastDashedTime < dashDuration) // If still dashing, no need check if player is pressing
             SetMovementType(dashMovement, false);
         else if (controls.IsSprinting)
@@ -262,8 +296,8 @@ public class PlayerMovement : MonoBehaviour
         MovementType.Clone(currMovementType, targetMovementType);
         movementTransitionCoroutine = null;
     }
-    
-    private void HorizontalMovement(float xInput) 
+
+    private void HorizontalMovement(float xInput)
     {
         // Force input to 1 if dashing
         if (currMovementType.type == MovementType.Type.DASHING)
@@ -284,15 +318,18 @@ public class PlayerMovement : MonoBehaviour
                 velocity.x += currMovementType.moveAcceleration * xInput * Time.deltaTime;
             // Moving in opposite direction / turning
             else
-                velocity.x -= currMovementType.turnAcceleration * (xInput) * Time.deltaTime;
+                velocity.x -= currMovementType.turnAcceleration * xInput * Time.deltaTime;
         }
 
-        if (ifOverrideMaxSpeed)
-            velocity.x = Mathf.Clamp(velocity.x, -overrideMaxSpeed, overrideMaxSpeed);
-        else if (groundChecker.IsTouchingTile)
-            velocity.x = Mathf.Clamp(velocity.x, -currMovementType.maxSpeed, currMovementType.maxSpeed);
-        else
-            velocity.x = Mathf.Clamp(velocity.x, -currMovementType.airStrafeMaxSpeed, currMovementType.airStrafeMaxSpeed);
+        if (ifClampHorizontalSpeed)
+        {
+            if (ifOverrideMaxSpeed)
+                velocity.x = Mathf.Clamp(velocity.x, -overrideMaxSpeed, overrideMaxSpeed);
+            else if (groundChecker.IsTouchingTile)
+                velocity.x = Mathf.Clamp(velocity.x, -currMovementType.maxSpeed, currMovementType.maxSpeed);
+            else
+                velocity.x = Mathf.Clamp(velocity.x, -currMovementType.airStrafeMaxSpeed, currMovementType.airStrafeMaxSpeed);
+        }
 
         if (velocity.x < 0)
             isLastFacingDirLeft = true;
@@ -352,6 +389,45 @@ public class PlayerMovement : MonoBehaviour
         velocity.y = Mathf.Max(velocity.y, maxFallVelocity);
     }
 
+    private void ClimbingMovement(Vector2 input)
+    {
+        float fallingOffWallSpeed = 5f;
+
+        // If moving opposite direction of wall,
+        if (isLastFacingDirLeft && input.x > 0f) // If wall on right and moving left
+        {
+            ifClampHorizontalSpeed = false;
+            velocity.x = fallingOffWallSpeed;
+            OnLeaveWall();
+        }
+        else if (!isLastFacingDirLeft && input.x < 0f) // If wall on right and moving left
+        {
+            ifClampHorizontalSpeed = false;
+            velocity.x = -fallingOffWallSpeed;
+            OnLeaveWall();
+        }
+
+        // Slow down the player if not pressing any buttons
+        if (input.y == 0f)
+        {
+            if (Mathf.Abs(velocity.y) > Mathf.Abs(climbingMovement.stopAcceleration * Time.deltaTime))
+                velocity.y = velocity.y + climbingMovement.stopAcceleration * Time.deltaTime * (velocity.y > 0f ? 1f : -1f);
+            else
+                velocity.y = 0f;
+        }
+        else
+        {
+            // If moving in the same direction
+            if (input.y * velocity.y >= 0)
+                velocity.y += climbingMovement.moveAcceleration * input.y * Time.deltaTime;
+            // Moving in opposite direction / turning
+            else
+                velocity.y -= climbingMovement.turnAcceleration * input.y * Time.deltaTime;
+        }
+
+        velocity.y = Mathf.Clamp(velocity.y, -climbingMovement.maxSpeed, climbingMovement.maxSpeed);
+    }
+
     // ========== Events ==========
     private void OnDash(InputAction.CallbackContext context)
     {
@@ -363,13 +439,31 @@ public class PlayerMovement : MonoBehaviour
         lastDashedTime = Time.timeSinceLevelLoad;
     }
 
+    private void OnClimbWall()
+    {
+        velocity.x = 0f;
+        SetMovementType(climbingMovement, false);
+    }
+
+    private void OnLeaveWall()
+    {
+        velocity.y = 0;
+        SetMovementType(walking, false);
+    }
+
+    private void OnHitGround()
+    {
+        ifClampHorizontalSpeed = true;
+    }
+
     private void OnValidate()
     {
         // Limit variables
 
         float minValue = 0.01f;
 
-        MovementType[] movementTypes = { walking, sprintMovement, dashMovement };
+        MovementType[] movementTypes = { walking, sprintMovement, dashMovement, climbingMovement };
+
         foreach (MovementType type in movementTypes)
         {
             type.maxSpeed = Mathf.Max(minValue, type.maxSpeed);
@@ -410,3 +504,5 @@ public class PlayerMovement : MonoBehaviour
         minJumpTime = 2 * minJumpHeight / jumpVelocity;
     }
 }
+
+
