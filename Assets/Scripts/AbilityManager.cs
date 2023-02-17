@@ -54,13 +54,15 @@ public class AbilityManager : MonoBehaviour
     public Ability dash;
     public Ability strongAttack;
     public Ability InvChameleon;
+    public List<Ability> all_abilities = new List<Ability>();
+
 
     //others
     public SpriteRenderer sr;
     public PlayerMovement player_movement;
     public GameObject player;
     public Rigidbody2D r;
-     public Animator playerAnim;
+    public Animator playerAnim;
     public SpriteRenderer[] srs;
 
     private void Awake()
@@ -70,6 +72,14 @@ public class AbilityManager : MonoBehaviour
 
     void Start()
     {
+        all_abilities.Add(healing);
+        all_abilities.Add(strongAttack);
+        all_abilities.Add(InvChameleon);
+        all_abilities.Add(dash);
+
+        current_ability_1 = GetRandomAbility();
+        current_ability_2 = GetRandomAbility();
+        current_ability_3 = GetRandomAbility();
         //get compoenents
         player = GameObject.FindGameObjectWithTag("player");
         
@@ -80,10 +90,6 @@ public class AbilityManager : MonoBehaviour
         dash = new Ability("dash", 0f, 10f, dashAction);
         strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
         healing = new Ability("Healing", 0f, 40f, healingAction);
-
-        current_ability_1 = InvChameleon;
-        current_ability_2 = dash;
-        current_ability_3 = strongAttack;
 
         Debug.Log("Current Abilities: " + current_ability_1 + ", " + current_ability_2 + ", " + current_ability_3);
     }
@@ -99,7 +105,7 @@ public class AbilityManager : MonoBehaviour
         a_image_2.fillAmount = fillAmount2;
 
         float fillAmount3 = 1 - (a_nextUseTime_3 - Time.time) / current_ability_3.cooldown;
-        a_image_3.fillAmount = fillAmount2;
+        a_image_3.fillAmount = fillAmount3;
 
         //check for input
         if (Input.GetKeyDown(KeyCode.Q) && Time.time >= a_nextUseTime_1)
@@ -113,6 +119,7 @@ public class AbilityManager : MonoBehaviour
         {
             StartCoroutine(Haptic(a_bgr_image_2));
             current_ability_2.use();
+
             a_nextUseTime_2 = Time.time + current_ability_2.cooldown;
         }
 
@@ -120,6 +127,7 @@ public class AbilityManager : MonoBehaviour
         {
             StartCoroutine(Haptic(a_bgr_image_3));
             current_ability_3.use();
+
             a_nextUseTime_3 = Time.time + current_ability_3.cooldown;
         }
 
@@ -184,6 +192,7 @@ public class AbilityManager : MonoBehaviour
         player_global_vars.Instance.stealthed = false;
 
     }
+
     IEnumerator strong()
     {
         //Start Passive buff
@@ -216,4 +225,15 @@ public class AbilityManager : MonoBehaviour
         return abilities;
     }
 
+
+    Ability GetRandomAbility()
+    {
+        Ability picked_ability;
+        int i;
+
+        i = UnityEngine.Random.Range(0, all_abilities.Count);
+        picked_ability = all_abilities[i];
+
+        return picked_ability;
+    }
 }
