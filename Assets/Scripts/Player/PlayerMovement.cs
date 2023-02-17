@@ -208,7 +208,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     [ReadOnly]
     bool ifIgnoreWallJump = false;
-    
+
+    [SerializeField]
+    [ReadOnly]
+    bool ifMidAirAfterWallJump = false;
+
     // ===== Private variables =====
     public MovementType CurrMovementType { get { return this.currMovementType; } }
 
@@ -381,7 +385,7 @@ public class PlayerMovement : MonoBehaviour
             ifReleaseJumpAfterJumping &&
             CoyoteTime())
         {
-            if (controls.MoveDir.x > 0f)
+            if (Mathf.Abs(controls.MoveDir.x) > 0f)
             {
                 if (controls.IsSprinting)
                     velocity.y = sprintJumpVelocity;
@@ -390,6 +394,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
                 velocity.y = jumpVelocity;
+
             lastJumpPressed = float.MinValue; // Prevent jump buffer from triggering again
             lastGroundedTime = float.MinValue;
             lastJumpTime = Time.time;
@@ -426,6 +431,8 @@ public class PlayerMovement : MonoBehaviour
         {
             OnLeaveWall();
             velocity = wallJumpVelocity;
+            overrideMaxSpeed = wallJumpVelocity.x;
+            ifOverrideMaxSpeed = true;
             return;
         }
 
@@ -488,6 +495,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnLeaveWall()
     {
+        if (!groundChecker.IsTouchingTile)
+            ifMidAirAfterWallJump = true;
+
         velocity.y = 0;
         ledgeChecker.gameObject.SetActive(false);
         SetMovementType(walking, false);
@@ -521,9 +531,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnHitGround()
     {
-        return;
-        // TODO: Do this after jam
-        ifOverrideMaxSpeed = false;
+        // TODO: Remove if condition after jam
+        if (ifMidAirAfterWallJump)
+            ifOverrideMaxSpeed = false;
+
+        ifMidAirAfterWallJump = false;
     }
 
     private void OnValidate()
