@@ -21,13 +21,16 @@ public class AnimationMachine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (control.MoveDir.x < 0)
+        if (control.MoveDir.x != 0 && player_movement.CurrMovementType.type != PlayerMovement.MovementType.Type.DASHING)
         {
-            gameObject.transform.localScale = new Vector2(-1, gameObject.transform.localScale.y);
-        }
-        if (control.MoveDir.x > 0)
-        {
-            gameObject.transform.localScale = new Vector2(1, gameObject.transform.localScale.y);
+            if (control.MoveDir.x < 0)
+            {
+                gameObject.transform.localScale = new Vector2(-1, gameObject.transform.localScale.y);
+            }
+            if (control.MoveDir.x > 0)
+            {
+                gameObject.transform.localScale = new Vector2(1, gameObject.transform.localScale.y);
+            }
         }
 
 

@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using UnityEngine.Windows;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Serializable]
-    class MovementType
+    public class MovementType
     {
         // For now is just helping for debugging
         public enum Type
@@ -31,6 +32,8 @@ public class PlayerMovement : MonoBehaviour
         public float stopTime;
         [Tooltip("Time to from max speed to max speed in the opposite direction")]
         public float turnTime;
+        // Transition between different movement states
+        // Transition time = transitionStartTiming + transitionEndTiming;
         // Put as -float.MinValue if want to transition immediately
         public float transitionStartTiming;
         public float transitionEndTiming;
@@ -110,7 +113,13 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Jumping")]
 
+    [Tooltip("Maximum jump height when player jumps while staying still")]
     [SerializeField] float maxJumpHeight;
+    [Tooltip("Maximum jump height when player jumps while walking")]
+    [SerializeField] float maxWalkJumpHeight;
+    [Tooltip("Maximum jump height when player jumps while sprinting")]
+    [SerializeField] float maxSprintJumpHeight;
+    [Tooltip("Minimum jump height when player taps jump")]
     [SerializeField] float minJumpHeight;
     [SerializeField]
     [ReadOnly]
@@ -123,12 +132,20 @@ public class PlayerMovement : MonoBehaviour
     [ReadOnly]
     float jumpVelocity;
     [SerializeField]
+    [ReadOnly]
+    float walkJumpVelocity;
+    [SerializeField]
+    [ReadOnly]
+    float sprintJumpVelocity;
+    [SerializeField]
     [Tooltip("Increased gravity when the player is moving up and the jump button is not pressed. Helps player drop down faster after releasing jump")]
     float gravityMultiplierWhenRelease;
     [Tooltip("Let the player jump even if they just fell off a platform")]
     [SerializeField] float coyoteTime;
     [Tooltip("Let the player queue the next jump if the player jumped in mid air.")]
     [SerializeField] float jumpBuffer;
+    [SerializeField]
+    Vector2 wallJumpVelocity;
 
     [Header("Others")]
 
@@ -187,16 +204,19 @@ public class PlayerMovement : MonoBehaviour
     [ReadOnly]
     bool ifReleaseJumpAfterJumping;
 
-    // Used to not clamp speed for some time, e.g. from jumping off a wall until landing
+    // For when jumping onto a wall while holding climb
     [SerializeField]
     [ReadOnly]
-    bool ifClampHorizontalSpeed = true;
+    bool ifIgnoreWallJump = false;
+    
+    // ===== Private variables =====
+    public MovementType CurrMovementType { get { return this.currMovementType; } }
 
     private void OnEnable()
     {
         groundChecker.OnHitTile += OnHitGround;
         wallChecker.OnHitTile += OnClimbWall;
-        wallChecker.OnExitTile += OnLeaveWall;
+        //wallChecker.OnExitTile += OnLeaveWall;
         ledgeChecker.OnExitTile += OnAtLedge;
     }
 
@@ -204,7 +224,7 @@ public class PlayerMovement : MonoBehaviour
     {
         groundChecker.OnHitTile -= OnHitGround;
         wallChecker.OnHitTile -= OnClimbWall;
-        wallChecker.OnExitTile -= OnLeaveWall;
+        //wallChecker.OnExitTile -= OnLeaveWall;
         ledgeChecker.OnExitTile -= OnAtLedge;
     }
 
@@ -226,6 +246,7 @@ public class PlayerMovement : MonoBehaviour
         //controls.OnDash += OnDash;
         controls.OnClimb += OnClimbWall;
         controls.OnClimbReleased += OnClimbReleased;
+        controls.OnJumpReleased += OnJumpReleased;
 
         MovementType.Clone(currMovementType, walking);
     }
@@ -235,6 +256,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 inputDir = controls.MoveDir;
 
         UpdateMovementTypeState();
+
         if (currMovementType.type != MovementType.Type.CLIMBING)
         {
             HorizontalMovement(inputDir.x);
@@ -325,15 +347,12 @@ public class PlayerMovement : MonoBehaviour
                 velocity.x -= currMovementType.turnAcceleration * xInput * Time.deltaTime;
         }
 
-        if (ifClampHorizontalSpeed)
-        {
-            if (ifOverrideMaxSpeed)
-                velocity.x = Mathf.Clamp(velocity.x, -overrideMaxSpeed, overrideMaxSpeed);
-            else if (groundChecker.IsTouchingTile)
-                velocity.x = Mathf.Clamp(velocity.x, -currMovementType.maxSpeed, currMovementType.maxSpeed);
-            else
-                velocity.x = Mathf.Clamp(velocity.x, -currMovementType.airStrafeMaxSpeed, currMovementType.airStrafeMaxSpeed);
-        }
+        if (ifOverrideMaxSpeed)
+            velocity.x = Mathf.Clamp(velocity.x, -overrideMaxSpeed, overrideMaxSpeed);
+        else if (groundChecker.IsTouchingTile)
+            velocity.x = Mathf.Clamp(velocity.x, -currMovementType.maxSpeed, currMovementType.maxSpeed);
+        else
+            velocity.x = Mathf.Clamp(velocity.x, -currMovementType.airStrafeMaxSpeed, currMovementType.airStrafeMaxSpeed);
 
         if (velocity.x < 0)
             isLastFacingDirLeft = true;
@@ -362,7 +381,15 @@ public class PlayerMovement : MonoBehaviour
             ifReleaseJumpAfterJumping &&
             CoyoteTime())
         {
-            velocity.y = jumpVelocity;
+            if (controls.MoveDir.x > 0f)
+            {
+                if (controls.IsSprinting)
+                    velocity.y = sprintJumpVelocity;
+                else
+                    velocity.y = walkJumpVelocity;
+            }
+            else
+                velocity.y = jumpVelocity;
             lastJumpPressed = float.MinValue; // Prevent jump buffer from triggering again
             lastGroundedTime = float.MinValue;
             lastJumpTime = Time.time;
@@ -395,29 +422,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void ClimbingMovement(Vector2 input)
     {
-        // TODO: Don't hard code the values
-        float fallingOffWallSpeed = 5f;
-
-        if (controls.IsJumping)
+        if (controls.IsJumping && !ifIgnoreWallJump)
         {
             OnLeaveWall();
-            ifClampHorizontalSpeed = false;
-            velocity.x = fallingOffWallSpeed * 5f;
-            velocity.y = fallingOffWallSpeed * 10f;
+            velocity = wallJumpVelocity;
             return;
-        }
-        // If moving opposite direction of wall,
-        else if (isLastFacingDirLeft && input.x > 0f) // If wall on right and moving left
-        {
-            OnLeaveWall();
-            ifClampHorizontalSpeed = false;
-            velocity.x = fallingOffWallSpeed;
-        }
-        else if (!isLastFacingDirLeft && input.x < 0f) // If wall on right and moving left
-        {
-            OnLeaveWall();
-            velocity.x = -fallingOffWallSpeed;
-            ifClampHorizontalSpeed = false;
         }
 
         // Slow down the player if not pressing any buttons
@@ -463,6 +472,9 @@ public class PlayerMovement : MonoBehaviour
         if (!controls.IsClimbing || !wallChecker.IsTouchingTile)
             return;
 
+        if (controls.IsJumping)
+            ifIgnoreWallJump = true;
+
         velocity.x = 0f;
         ledgeChecker.gameObject.SetActive(true);
         SetMovementType(climbingMovement, false);
@@ -488,6 +500,11 @@ public class PlayerMovement : MonoBehaviour
 
         OnLeaveWall();
     }
+
+    private void OnJumpReleased(InputAction.CallbackContext context)
+    {
+        ifIgnoreWallJump = false;
+    }
     
     private void OnAtLedge()
     {
@@ -504,7 +521,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnHitGround()
     {
-        ifClampHorizontalSpeed = true;
+        return;
+        // TODO: Do this after jam
+        ifOverrideMaxSpeed = false;
     }
 
     private void OnValidate()
@@ -552,6 +571,8 @@ public class PlayerMovement : MonoBehaviour
         // Jumping
 
         jumpVelocity = (2f * maxJumpHeight) / timeToMaxHeight;
+        walkJumpVelocity = (2f * maxWalkJumpHeight) / timeToMaxHeight;
+        sprintJumpVelocity = (2f * maxSprintJumpHeight) / timeToMaxHeight;
         minJumpTime = 2 * minJumpHeight / jumpVelocity;
     }
 }

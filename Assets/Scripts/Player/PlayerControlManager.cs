@@ -35,6 +35,7 @@ public class PlayerControlManager : MonoBehaviour
     public event Action<InputAction.CallbackContext> OnDash;
     public event Action<InputAction.CallbackContext> OnClimb;
     public event Action<InputAction.CallbackContext> OnClimbReleased;
+    public event Action<InputAction.CallbackContext> OnJumpReleased;
 
     // Singleton
     public static PlayerControlManager instance { get; private set; }
@@ -77,9 +78,10 @@ public class PlayerControlManager : MonoBehaviour
         primaryAttack.Enable();
         secondaryAttack.Enable();
 
-        dash.performed += (InputAction.CallbackContext context) => OnDash(context);
-        climb.performed += (InputAction.CallbackContext context) => OnClimb(context);
-        climb.canceled += (InputAction.CallbackContext context) => OnClimbReleased(context);
+        dash.performed += (InputAction.CallbackContext context) => OnDash?.Invoke(context);
+        climb.performed += (InputAction.CallbackContext context) => OnClimb?.Invoke(context);
+        climb.canceled += (InputAction.CallbackContext context) => OnClimbReleased?.Invoke(context);
+        jump.canceled += (InputAction.CallbackContext context) => OnJumpReleased?.Invoke(context);
     }
 
     private void OnDisable()

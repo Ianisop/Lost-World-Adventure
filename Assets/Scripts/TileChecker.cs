@@ -24,13 +24,13 @@ public class TileChecker : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (IsLayerInMask(collision.gameObject.layer))
+        if (IsLayerInMask(collision.gameObject.layer) && gameObject.activeInHierarchy)
             OnHitTile?.Invoke();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (IsLayerInMask(collision.gameObject.layer))
+        if (IsLayerInMask(collision.gameObject.layer) && gameObject.activeInHierarchy)
             OnExitTile?.Invoke();
     }
 
