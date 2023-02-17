@@ -64,6 +64,7 @@ public class AbilityManager : MonoBehaviour
     public Rigidbody2D r;
     public Animator playerAnim;
     public SpriteRenderer[] srs;
+    public GameObject strongHit;
 
     private void Awake()
     {
@@ -72,6 +73,14 @@ public class AbilityManager : MonoBehaviour
 
     void Start()
     {
+
+        //define all abilities
+        InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
+        dash = new Ability("dash", 0f, 10f, dashAction);
+        strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
+        healing = new Ability("Healing", 0f, 40f, healingAction);
+
+        //Add abilities
         all_abilities.Add(healing);
         all_abilities.Add(strongAttack);
         all_abilities.Add(InvChameleon);
@@ -85,13 +94,9 @@ public class AbilityManager : MonoBehaviour
         
         
 
-        //define all abilities
-        InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
-        dash = new Ability("dash", 0f, 10f, dashAction);
-        strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
-        healing = new Ability("Healing", 0f, 40f, healingAction);
+        
 
-        Debug.Log("Current Abilities: " + current_ability_1 + ", " + current_ability_2 + ", " + current_ability_3);
+        Debug.Log("Current Abilities: " + current_ability_1.abilityName + ", " + current_ability_2.abilityName + ", " + current_ability_3.abilityName);
     }
 
 
@@ -157,21 +162,18 @@ public class AbilityManager : MonoBehaviour
     {
         player_movement.StartDash();
 
-
     }
         //still a work in progress
     void strongAttackAction()
     {
         StartCoroutine(strong());
-
-    
     }
 
     IEnumerator stealth()
     {
         player_global_vars.Instance.stealthed = true;
         
-        Debug.Log("startign stealth");
+        Debug.Log("starting stealth");
         Color initialColor;
         initialColor = sr.color;
         foreach(var x in srs)
@@ -195,8 +197,10 @@ public class AbilityManager : MonoBehaviour
 
     IEnumerator strong()
     {
+        //activate hit box to deal damage
+        strongHit.SetActive(true);
         //Start Passive buff
-        player_global_vars.Instance.is_boosted = true;
+       
         Debug.Log("Knife Attacks are now boosted");
 
         //Just something to visualize the passive buff
@@ -205,13 +209,8 @@ public class AbilityManager : MonoBehaviour
             if (x.sprite.name == "test_6" || x.sprite.name == "test_9" || x.sprite.name == "test_10")
                 x.color = Color.blue;
         }
-        yield return new WaitForSeconds(5f);
-        foreach (var x in srs)
-        {
-            if (x.sprite.name == "test_6" || x.sprite.name == "test_9" || x.sprite.name == "test_10")
-                x.color = Color.white;
-        }
-        player_global_vars.Instance.is_boosted = false;
+        yield return new WaitForSeconds(1f);
+        strongHit.SetActive(false);
 
     }
 
@@ -228,12 +227,25 @@ public class AbilityManager : MonoBehaviour
 
     Ability GetRandomAbility()
     {
+        List<Ability> abilities = getCurrentAbilities();
         Ability picked_ability;
+        bool is_valid = false;
         int i;
 
         i = UnityEngine.Random.Range(0, all_abilities.Count);
-        picked_ability = all_abilities[i];
-
+        while(is_valid == false)
+        {
+            //if the random ability is equal to one of the abilities in the list
+            if (abilities.Contains(all_abilities[i]))
+                i = UnityEngine.Random.Range(0, all_abilities.Count); //search for new ability
+            else
+                is_valid = true;
+        }
+            
+            picked_ability = all_abilities[i];
+            if (picked_ability.abilityName == "Strong Attack")
+                 player_global_vars.Instance.is_boosted = true;
+                 
         return picked_ability;
     }
 }

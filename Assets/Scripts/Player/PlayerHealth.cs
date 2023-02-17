@@ -25,6 +25,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Update()
     {
+        CreateHearts();
         if(playerHealth <= 0)
         {
             Time.timeScale = 0;
@@ -45,6 +46,7 @@ public class PlayerHealth : MonoBehaviour
     }
     public void heal(float healAmount)
     {
+        Debug.Log("Healing");
         float temp = playerHealth + healAmount; 
         if(temp > maxHealth)
             playerHealth = maxHealth;
@@ -58,6 +60,7 @@ public class PlayerHealth : MonoBehaviour
         List<AbilityManager.Ability> abilities = AbilityManager.Instance.getCurrentAbilities();
         if(abilities.Contains(AbilityManager.Instance.healing))
         {
+            Debug.Log("Resisting");
             playerHealth -= (damageTaken - 1);
         }
         else

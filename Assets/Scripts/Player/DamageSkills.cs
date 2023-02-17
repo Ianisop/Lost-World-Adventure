@@ -10,27 +10,57 @@ public class DamageSkills : MonoBehaviour
     private Color originalColor;
     private Color hit_color = new Color(229, 0, 0);
     private int[] skills = {0,1,2};
+    private LayerMask targetLayers;
+    public BoxCollider2D hitBox;
 
      private void OnTriggerEnter2D(Collider2D collision)
     {
         List<AbilityManager.Ability> abilities = abilityManager.getCurrentAbilities();
-        float skillDmg = 3;
-        foreach (var ability in abilities)
+    
+        List<Collider2D> hits = new List<Collider2D>();  
+        hits.Add(collision);
+
+        foreach(Collider2D hit in hits)
         {
-            if(ability.abilityName == "Strong Attack")
-                skillDmg = 3;
-        }
-        
-        if (collision.CompareTag("Enemy") || collision.CompareTag("rat") || collision.CompareTag("turret"))
-        {
-            enemy_srs = collision.GetComponentInParent<parole_enemy_ai>().srs;
-            foreach (var x in enemy_srs)
+            if (hit.CompareTag("Enemy"))
             {
-                x.color = hit_color;
+                enemy_srs = hit.GetComponentInParent<parole_enemy_ai>().srs;
+                foreach (var x in enemy_srs)
+                {
+                    x.color = hit_color;
+                }
+                
+                Debug.Log("Haiyaah! Enemy hit by strong attack");
+                hit.gameObject.GetComponent<Enemy_Health>().health -= 3;
+                
             }
-            Invoke("ResetSpritesColor", 0.1f);
-            collision.gameObject.GetComponent<Enemy_Health>().health -= skillDmg;
+            if (hit.CompareTag("rat"))
+            {
+                enemy_sr = collision.gameObject.GetComponentInParent<SpriteRenderer>();
+                enemy_sr.color = hit_color;
+    
+                Debug.Log("Haiyaah! Enemy hit by strong attack");
+                hit.gameObject.GetComponent<Enemy_Health>().health -= 3;
+                
+            }
+            if (hit.CompareTag("turret"))
+            {
+                enemy_srs = hit.GetComponentInParent<stationary_enemy_ai>().srs;
+                foreach (var x in enemy_srs)
+                {
+                    x.color = hit_color;
+                }
+               
+                Debug.Log("Haiyaah! Enemy hit by strong attack");
+                hit.gameObject.GetComponent<Enemy_Health>().health -= 3;
+                
+            }
             
         }
+     
+           
+        
     }
+
+   
 }

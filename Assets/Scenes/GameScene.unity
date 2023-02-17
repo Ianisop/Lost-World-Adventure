@@ -574,6 +574,68 @@ MonoBehaviour:
   lastDashedTime: 0
   ifReleaseJumpAfterJumping: 0
   ifIgnoreWallJump: 0
+  ifMidAirAfterWallJump: 0
+--- !u!1001 &306152628
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942092997, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377086942093002, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_Name
+      value: pirate_enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 7491377088729139447, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 34a0e599a4eabe245a9c76707fa6a174, type: 3}
 --- !u!1 &309564438
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,6 +838,7 @@ MonoBehaviour:
   - {fileID: 6516893223930625306}
   - {fileID: 6516893223177203903}
   - {fileID: 6516893223710149333}
+  strongHit: {fileID: 1103097715}
 --- !u!1 &458241763
 GameObject:
   m_ObjectHideFlags: 0
@@ -2608,7 +2671,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 2.262226, y: -1.5265878}
+  m_Offset: {x: 2, y: -1.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -2619,7 +2682,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.9698524, y: 2.7204063}
+  m_Size: {x: 4, y: 3}
   m_EdgeRadius: 0
 --- !u!114 &1103097719
 MonoBehaviour:
@@ -2634,6 +2697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilityManager: {fileID: 452225568}
+  hitBox: {fileID: 1103097718}
 --- !u!1 &1276899857
 GameObject:
   m_ObjectHideFlags: 0
