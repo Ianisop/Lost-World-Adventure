@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour
 {
     [SerializeField] GameObject menu;
-    [SerializeField] GameObject options;
+    [SerializeField] OptionsMenu options;
 
     private void Start()
     {
@@ -32,13 +32,12 @@ public class PauseMenu : MonoBehaviour
     {
         Time.timeScale = 1f;
         menu.SetActive(false);
-        options.SetActive(false);
+        options.CloseOptionMenu();
     }
 
     public void OnOptionsClicked()
     {
-        // TODO: Open options
-        options.SetActive(true);
+        options.OpenOptionsMenu();
     }
 
     public void OnMainMenuClicked()
