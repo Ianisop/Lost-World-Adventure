@@ -351,7 +351,7 @@ public class PlayerMovement : MonoBehaviour
                 velocity.x -= currMovementType.turnAcceleration * xInput * Time.deltaTime;
         }
 
-        if (ifOverrideMaxSpeed)
+        if (ifOverrideMaxSpeed && currMovementType.type != MovementType.Type.DASHING)
             velocity.x = Mathf.Clamp(velocity.x, -overrideMaxSpeed, overrideMaxSpeed);
         else if (groundChecker.IsTouchingTile)
             velocity.x = Mathf.Clamp(velocity.x, -currMovementType.maxSpeed, currMovementType.maxSpeed);
