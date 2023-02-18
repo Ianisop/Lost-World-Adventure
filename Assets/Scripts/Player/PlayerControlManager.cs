@@ -20,6 +20,7 @@ public class PlayerControlManager : MonoBehaviour
     private InputAction inventory;
     private InputAction primaryAttack;
     private InputAction secondaryAttack;
+    private InputAction pause;
 
     [field: SerializeField] public Vector2 Aim { get; private set; }
     [field: SerializeField] public Vector2 MoveDir { get; private set; }
@@ -36,6 +37,7 @@ public class PlayerControlManager : MonoBehaviour
     public event Action<InputAction.CallbackContext> OnClimb;
     public event Action<InputAction.CallbackContext> OnClimbReleased;
     public event Action<InputAction.CallbackContext> OnJumpReleased;
+    public event Action<InputAction.CallbackContext> OnPause;
 
     // Singleton
     public static PlayerControlManager instance { get; private set; }
@@ -63,6 +65,7 @@ public class PlayerControlManager : MonoBehaviour
         inventory = playerControls.Player.Inventory; 
         primaryAttack= playerControls.Player.PrimaryAttack;
         secondaryAttack= playerControls.Player.SecondaryAttack;
+        pause = playerControls.Player.Pause;
     }
 
     private void OnEnable()
@@ -77,11 +80,13 @@ public class PlayerControlManager : MonoBehaviour
         inventory.Enable();
         primaryAttack.Enable();
         secondaryAttack.Enable();
+        pause.Enable();
 
         dash.performed += (InputAction.CallbackContext context) => OnDash?.Invoke(context);
         climb.performed += (InputAction.CallbackContext context) => OnClimb?.Invoke(context);
         climb.canceled += (InputAction.CallbackContext context) => OnClimbReleased?.Invoke(context);
         jump.canceled += (InputAction.CallbackContext context) => OnJumpReleased?.Invoke(context);
+        pause.performed += (InputAction.CallbackContext context) => OnPause?.Invoke(context);
     }
 
     private void OnDisable()
@@ -96,6 +101,7 @@ public class PlayerControlManager : MonoBehaviour
         inventory.Disable();
         primaryAttack.Disable();
         secondaryAttack.Disable();
+        pause.Disable();
     }
 
     private void Update()
@@ -104,7 +110,6 @@ public class PlayerControlManager : MonoBehaviour
         MoveDir = move.ReadValue<Vector2>();
         IsJumping = jump.IsPressed(); // Check holding
         IsSprinting = sprint.phase == InputActionPhase.Performed;
-        //IsClimbing = climb.phase == InputActionPhase.Performed;
         IsInteracting = interact.WasPressedThisFrame();
         IsOpeningInventory = inventory.WasPressedThisFrame();
         IsUsingPrimaryAttack = primaryAttack.WasPressedThisFrame();
