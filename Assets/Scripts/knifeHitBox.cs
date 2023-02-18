@@ -54,6 +54,21 @@ public class knifeHitBox : MonoBehaviour
                 collision.gameObject.GetComponent<Enemy_Health>().health -= 1;
 
         }
+        if (collision.CompareTag("Boss"))
+        {
+            Debug.Log("hit the boss");
+            enemy_srs = collision.GetComponentInParent<Boss>().srs;
+            foreach (var x in enemy_srs)
+            {
+                x.color = hit_color;
+            }
+            Invoke("ResetSpritesColor", 0.1f);
+            if (player_global_vars.Instance.is_boosted == true)
+                collision.gameObject.GetComponent<Boss>().health -= 3;
+            else
+                collision.gameObject.GetComponent<Boss>().health -= 3;
+
+        }
     }
 
 
