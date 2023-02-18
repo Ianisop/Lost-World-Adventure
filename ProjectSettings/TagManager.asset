@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - rat
   - turret
+  - Ground
   layers:
   - Default
   - TransparentFX
