@@ -430,8 +430,20 @@ public class PlayerMovement : MonoBehaviour
         if (controls.IsJumping && !ifIgnoreWallJump)
         {
             OnLeaveWall();
-            velocity = wallJumpVelocity;
-            overrideMaxSpeed = wallJumpVelocity.x;
+            print("collider: " + Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f));
+            var a = Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f, wallChecker.LayerMask);
+            if (Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f).collider)
+            {
+                overrideMaxSpeed = wallJumpVelocity.x;
+                velocity = wallJumpVelocity;
+                print("move right");
+            }
+            else
+            {
+                print("move left");
+                overrideMaxSpeed = -wallJumpVelocity.x;
+                velocity = new Vector2(-wallJumpVelocity.x, wallJumpVelocity.y);
+            }
             ifOverrideMaxSpeed = true;
             return;
         }
@@ -536,6 +548,11 @@ public class PlayerMovement : MonoBehaviour
             ifOverrideMaxSpeed = false;
 
         ifMidAirAfterWallJump = false;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawRay(wallChecker.transform.position, Vector2.left);
     }
 
     private void OnValidate()
