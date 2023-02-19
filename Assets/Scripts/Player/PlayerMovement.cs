@@ -548,12 +548,6 @@ public class PlayerMovement : MonoBehaviour
             ifOverrideMaxSpeed = false;
 
         ifMidAirAfterWallJump = false;
-
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawRay(wallChecker.transform.position, Vector2.left);
     }
 
     private void OnValidate()
