@@ -4,31 +4,33 @@ using UnityEngine;
 
 public class rat_hitbox : MonoBehaviour
 {
+    public float cooldown = 4f;
+    public float lastHitTime = float.MinValue;
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void damagePlayer()
     {
-        rat_ai ai  = GetComponentInParent<rat_ai>();
+        rat_ai ai = GetComponentInParent<rat_ai>();
         ai.damagePlayer();
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("player"))
+        if (other.CompareTag("player") && Time.time - lastHitTime > cooldown)
         {
-            InvokeRepeating("damagePlayer", 0f, 2);
+            lastHitTime = Time.time;
+            damagePlayer();
         }
-
 
     }
 }
