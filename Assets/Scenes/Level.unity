@@ -7558,6 +7558,7 @@ MonoBehaviour:
   coyoteTime: 0.2
   jumpBuffer: 0.05
   wallJumpVelocity: {x: 30, y: 20}
+  enemyKnockbackVelocity: {x: 20, y: 25}
   groundChecker: {fileID: 525841821}
   ceilingChecker: {fileID: 1809667552}
   wallChecker: {fileID: 1216013101}
