@@ -21,6 +21,7 @@ public class PlayerControlManager : MonoBehaviour
     private InputAction primaryAttack;
     private InputAction secondaryAttack;
     private InputAction pause;
+    private InputAction moveDown;
 
     [field: SerializeField] public Vector2 Aim { get; private set; }
     [field: SerializeField] public Vector2 MoveDir { get; private set; }
@@ -38,6 +39,7 @@ public class PlayerControlManager : MonoBehaviour
     public event Action<InputAction.CallbackContext> OnClimbReleased;
     public event Action<InputAction.CallbackContext> OnJumpReleased;
     public event Action<InputAction.CallbackContext> OnPause;
+    public event Action<InputAction.CallbackContext> OnMoveDown;
 
     // Singleton
     public static PlayerControlManager instance { get; private set; }
@@ -66,6 +68,7 @@ public class PlayerControlManager : MonoBehaviour
         primaryAttack= playerControls.Player.PrimaryAttack;
         secondaryAttack= playerControls.Player.SecondaryAttack;
         pause = playerControls.Player.Pause;
+        moveDown = playerControls.Player.MoveDown;
     }
 
     private void OnEnable()
@@ -81,12 +84,14 @@ public class PlayerControlManager : MonoBehaviour
         primaryAttack.Enable();
         secondaryAttack.Enable();
         pause.Enable();
+        moveDown.Enable();
 
         dash.performed += (InputAction.CallbackContext context) => OnDash?.Invoke(context);
         climb.performed += (InputAction.CallbackContext context) => OnClimb?.Invoke(context);
         climb.canceled += (InputAction.CallbackContext context) => OnClimbReleased?.Invoke(context);
         jump.canceled += (InputAction.CallbackContext context) => OnJumpReleased?.Invoke(context);
         pause.performed += (InputAction.CallbackContext context) => OnPause?.Invoke(context);
+        moveDown.performed += (InputAction.CallbackContext context) => OnMoveDown?.Invoke(context);
     }
 
     private void OnDisable()
