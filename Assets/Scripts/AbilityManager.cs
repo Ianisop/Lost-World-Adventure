@@ -76,28 +76,11 @@ public class AbilityManager : MonoBehaviour
     void Start()
     {
 
-        //define all abilities
-        InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
-        dash = new Ability("dash", 0f, 10f, dashAction);
-        strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
-        healing = new Ability("Healing", 0f, 40f, healingAction);
+        SetRandomAbilities();
 
-        //Add abilities
-        all_abilities.Add(healing);
-        all_abilities.Add(strongAttack);
-        all_abilities.Add(InvChameleon);
-        all_abilities.Add(dash);
-
-        current_ability_1 = GetRandomAbility();
-        current_ability_2 = GetRandomAbility();
-        current_ability_3 = GetRandomAbility();
         //get compoenents
         player = GameObject.FindGameObjectWithTag("player");
         
-        
-
-        
-
         Debug.Log("Current Abilities: " + current_ability_1.abilityName + ", " + current_ability_2.abilityName + ", " + current_ability_3.abilityName);
     }
 
@@ -148,7 +131,31 @@ public class AbilityManager : MonoBehaviour
     }
 
 
+    public void SetRandomAbilities()
+    {
+        //define all abilities
+        InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
+        dash = new Ability("dash", 0f, 10f, dashAction);
+        strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
+        healing = new Ability("Healing", 0f, 40f, healingAction);
 
+        //Add abilities
+        
+            all_abilities.Add(healing);
+            all_abilities.Add(strongAttack);
+            all_abilities.Add(InvChameleon);
+            all_abilities.Add(dash);
+        
+
+        //Assign the random abilities to three slots
+        current_ability_1 = null;
+        current_ability_2 = null;
+        current_ability_3 = null;
+
+        current_ability_1 = GetRandomAbility();
+        current_ability_2 = GetRandomAbility();
+        current_ability_3 = GetRandomAbility();
+    }
 
     void healingAction()
     {
