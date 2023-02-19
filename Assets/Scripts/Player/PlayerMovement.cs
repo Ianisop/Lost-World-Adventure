@@ -475,6 +475,9 @@ public class PlayerMovement : MonoBehaviour
     {
         SetMovementType(dashMovement, false);
         lastDashedTime = Time.timeSinceLevelLoad;
+
+        playerSound.OnDash();
+        print("Dashing");
     }
 
     private void OnDash(InputAction.CallbackContext context)

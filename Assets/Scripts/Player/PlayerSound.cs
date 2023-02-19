@@ -4,27 +4,34 @@ using UnityEngine;
 
 public class PlayerSound : MonoBehaviour
 {
+    // Done
     public AudioSource attack;
+    public GameObject strongAttackHitBox;
     public AudioSource jump;
     public AudioSource footstep;
+    public AudioSource dash;
+    public AudioSource stealth;
+    public AudioSource heavyAttackHit;
+    public AudioSource healing;
+    // Not sure how to do
+    public AudioSource heavyAttackMiss;
     public AudioSource landing;
     public AudioSource fall;
-    public AudioSource stealth;
+    public AudioSource dashHit;
 
-    public void OnFootstep()
-    {
-        footstep.Play();
-    }
     public void OnAttack()
     {
-        attack.Play();
+        if (strongAttackHitBox.activeInHierarchy)
+            heavyAttackHit.Play();
+        else
+            attack.Play();
     }
-    public void OnJump()
-    {
-        jump.Play();
-    }
-    public void OnLand()
-    {
-        landing.Play();
-    }
+    public void OnJump() => jump.Play();
+    public void OnFootstep() => footstep.Play();
+    public void OnDash() => dash.Play();
+    public void OnStealth() => stealth.Play();
+    public void OnHeal() => healing.Play();
+
+    // Not sure how to do
+    public void OnLand() => landing.Play();
 }

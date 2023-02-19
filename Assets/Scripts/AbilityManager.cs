@@ -66,6 +66,8 @@ public class AbilityManager : MonoBehaviour
     public SpriteRenderer[] srs;
     public GameObject strongHit;
 
+    public PlayerSound playerSound;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -150,11 +152,13 @@ public class AbilityManager : MonoBehaviour
 
     void healingAction()
     {
+        playerSound.OnHeal();
         PlayerHealth.Instance.heal(2);
     }
 
     void InvChameleonAction()
     {
+        playerSound.OnStealth();
         StartCoroutine(stealth());
     }
 

@@ -5,10 +5,16 @@ using UnityEngine;
 public class Enemy_Health : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float health = 100f;
-
+    public float health { 
+        get { return _health; } 
+        set { 
+            _health = value; 
+            hurtSound?.Play();
+        } 
+    }
+    public float _health = 100f;
     public static Enemy_Health Instance;
-
+    public AudioSource hurtSound;
     private void Awake()
     {
         if (Instance == null) Instance = this;

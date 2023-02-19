@@ -18,6 +18,8 @@ public class stationary_enemy_ai : MonoBehaviour
     public SpriteRenderer[] srs;
     public float distance;
 
+    public AudioSource shoot;
+    public AudioSource notice;
 
     void Awake()
     {
@@ -75,6 +77,8 @@ public class stationary_enemy_ai : MonoBehaviour
             projectileRigidbody.velocity = direction * 10f; // adjust the velocity to control the speed of the projectiles
 
             angle += 360f / numProjectiles;
+
+            shoot.Play();
             yield return new WaitForSeconds(delayBetweenProjectiles);
         }
     }
@@ -86,7 +90,8 @@ public class stationary_enemy_ai : MonoBehaviour
             attack = true;
             StartCoroutine(StartShooting());
             Debug.Log("player detected");
-            
+
+            notice.Play();
         }
     }
 
