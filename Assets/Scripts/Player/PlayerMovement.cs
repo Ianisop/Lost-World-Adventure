@@ -283,9 +283,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.name.Contains("enemy") || collision.gameObject.name.Contains("rat"))
+            print("HIT" + collision.gameObject.tag);
+        if ((collision.gameObject.name.Contains("enemy") || collision.gameObject.name.Contains("rat")))
         {
-            print("HIT");
             overrideMaxSpeed = enemyKnockbackVelocity.x;
 
             if (collision.transform.position.x > transform.position.x)
