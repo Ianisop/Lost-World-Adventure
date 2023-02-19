@@ -48,7 +48,7 @@ public class rat_ai : MonoBehaviour
 
     public void damagePlayer()
     {
-        PlayerHealth.Instance.TakeDamage(1);
+        PlayerHealth.Instance.TakeDamage(2);
     }
 
     public void SelfDestruct()

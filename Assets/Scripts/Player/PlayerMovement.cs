@@ -145,6 +145,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float jumpBuffer;
     [SerializeField]
     Vector2 wallJumpVelocity;
+    [SerializeField]
+    Vector2 enemyKnockbackVelocity;
 
     [Header("Others")]
 
@@ -277,6 +279,23 @@ public class PlayerMovement : MonoBehaviour
 
         rb.velocity = Vector2.zero;
         rb.MovePosition(rb.position + velocity * Time.deltaTime);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.name.Contains("enemy") || collision.gameObject.name.Contains("rat"))
+        {
+            print("HIT");
+            overrideMaxSpeed = enemyKnockbackVelocity.x;
+
+            if (collision.transform.position.x > transform.position.x)
+                velocity = enemyKnockbackVelocity;
+            else
+                velocity = new Vector2(-enemyKnockbackVelocity.x, enemyKnockbackVelocity.y);
+
+            ifMidAirAfterWallJump = true;
+            ifOverrideMaxSpeed = true;
+        }
     }
 
     // ========== Custom Functions ==========
