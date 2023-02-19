@@ -30,6 +30,8 @@ public class PlayerHealth : MonoBehaviour
         {
             Time.timeScale = 0;
             Destroy(gameObject);
+
+            FindObjectOfType<GameOver>(true).OnGameOver();
         }
     }
 
