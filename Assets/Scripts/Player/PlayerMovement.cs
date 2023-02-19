@@ -153,6 +153,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] TileChecker ceilingChecker;
     [SerializeField] TileChecker wallChecker;
     [SerializeField] TileChecker ledgeChecker;
+    PlayerSound playerSound;
 
     // ===== Game Jam Specific, remove all game jam =====
     public float overrideMaxSpeed;
@@ -198,6 +199,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     [ReadOnly]
     float lastDashedTime;
+    [SerializeField]
+    [ReadOnly]
+    float lastLandSoundPlayed;
 
     // If the player has released the jump button after jumping
     [SerializeField]
@@ -235,6 +239,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerSound = GetComponent<PlayerSound>();
     }
 
     private void Start()
@@ -399,6 +404,8 @@ public class PlayerMovement : MonoBehaviour
             lastGroundedTime = float.MinValue;
             lastJumpTime = Time.time;
             ifReleaseJumpAfterJumping = false;
+
+            playerSound.OnJump();
         }
         if (!controls.IsJumping)
         {
@@ -541,6 +548,7 @@ public class PlayerMovement : MonoBehaviour
             ifOverrideMaxSpeed = false;
 
         ifMidAirAfterWallJump = false;
+
     }
 
     private void OnDrawGizmos()

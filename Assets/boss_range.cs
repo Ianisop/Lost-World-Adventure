@@ -22,6 +22,7 @@ public class boss_range : MonoBehaviour
         if(collision.CompareTag("player"))
         {
             player_global_vars.Instance.boss_fight = true;
+            FindObjectOfType<Music>()?.OnBoss();
         }
     }
 }

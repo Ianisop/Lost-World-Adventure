@@ -36,6 +36,6 @@ public class AnimationMachine : MonoBehaviour
 
 
 
-        anim.SetFloat("x", player_movement.velocity.sqrMagnitude);
+        anim.SetFloat("x", Mathf.Min(player_movement.velocity.sqrMagnitude, 1f));
     }
 }
