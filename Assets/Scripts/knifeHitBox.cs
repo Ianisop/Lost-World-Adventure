@@ -33,10 +33,15 @@ public class knifeHitBox : MonoBehaviour
             enemy_sr = collision.gameObject.GetComponentInParent<SpriteRenderer>();
             enemy_sr.color = hit_color;
             Invoke("ResetSpriteColor", 0.1f);
-            if(player_global_vars.Instance.is_boosted == true)
-                collision.gameObject.GetComponent<Enemy_Health>().health -= 2;
-            else
-                collision.gameObject.GetComponent<Enemy_Health>().health -= 1;
+            Enemy_Health enemy_Health = collision.gameObject.GetComponent<Enemy_Health>();
+            if (enemy_Health != null)
+            {
+                if (player_global_vars.Instance.is_boosted == true)
+                    enemy_Health.health -= 2;
+                else
+                    enemy_Health.health -= 1;
+
+            }
 
         }
         if (collision.CompareTag("turret"))
