@@ -37,7 +37,7 @@ public class main_menu : MonoBehaviour
     void startAction()
     {
         Debug.Log("hit");
-        FadeToScene("GameScene");
+        FadeToScene("Level");
     }
 
     void quitAction()
