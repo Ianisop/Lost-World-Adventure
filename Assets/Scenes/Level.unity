@@ -16567,6 +16567,11 @@ MonoBehaviour:
   a_nextUseTime_2: 0
   a_nextUseTime_3: 0
   target_time: 0
+  ability_sprites:
+  - {fileID: -1272367328, guid: 89cdb9e36240aba47862c685a862d78a, type: 3}
+  - {fileID: -269324668, guid: 89cdb9e36240aba47862c685a862d78a, type: 3}
+  - {fileID: 22094964, guid: 89cdb9e36240aba47862c685a862d78a, type: 3}
+  - {fileID: 363880824, guid: 89cdb9e36240aba47862c685a862d78a, type: 3}
   sr: {fileID: 428397519}
   player_movement: {fileID: 1383564293}
   player: {fileID: 1383564289}
