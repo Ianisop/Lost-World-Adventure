@@ -3273,7 +3273,6 @@ GameObject:
   - component: {fileID: 634539934}
   - component: {fileID: 634539937}
   - component: {fileID: 634539938}
-  - component: {fileID: 634539939}
   m_Layer: 3
   m_Name: Open Sprite Shape
   m_TagString: Untagged
@@ -3721,18 +3720,6 @@ PlatformEffector2D:
   m_UseSideFriction: 0
   m_UseSideBounce: 0
   m_SideArc: 1
---- !u!114 &634539939
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 634539933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 511631f416aa37946a5c3b58e1d20f47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &635395909
 GameObject:
   m_ObjectHideFlags: 0
