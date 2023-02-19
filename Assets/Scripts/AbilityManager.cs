@@ -55,6 +55,7 @@ public class AbilityManager : MonoBehaviour
     public Ability strongAttack;
     public Ability InvChameleon;
     public List<Ability> all_abilities = new List<Ability>();
+    public List<Sprite> ability_sprites = new List<Sprite>();
 
 
     //others
@@ -77,7 +78,7 @@ public class AbilityManager : MonoBehaviour
     {
 
         SetRandomAbilities();
-
+        setAbilityIcons();
         //get compoenents
         player = GameObject.FindGameObjectWithTag("player");
         
@@ -135,7 +136,7 @@ public class AbilityManager : MonoBehaviour
     {
         //define all abilities
         InvChameleon = new Ability("Stealth", 0f, 20f, InvChameleonAction);
-        dash = new Ability("dash", 0f, 10f, dashAction);
+        dash = new Ability("Dash", 0f, 10f, dashAction);
         strongAttack = new Ability ("Strong Attack", 3f, 12f, strongAttackAction);
         healing = new Ability("Healing", 0f, 40f, healingAction);
 
@@ -155,6 +156,40 @@ public class AbilityManager : MonoBehaviour
         current_ability_1 = GetRandomAbility();
         current_ability_2 = GetRandomAbility();
         current_ability_3 = GetRandomAbility();
+
+        //setAbilityIcons;
+    }
+    
+    void setAbilityIcons()
+    {
+       if(current_ability_1.abilityName == "Stealth")
+            a_image_1.GetComponent<Image>().sprite = ability_sprites[0];
+        else if(current_ability_1.abilityName == "Dash")
+            a_image_1.GetComponent<Image>().sprite = ability_sprites[1];
+        else if(current_ability_1.abilityName == "Strong Attack")
+            a_image_1.GetComponent<Image>().sprite = ability_sprites[2];
+        else if(current_ability_1.abilityName == "Healing")
+            a_image_1.GetComponent<Image>().sprite = ability_sprites[3];
+
+        if(current_ability_2.abilityName == "Stealth")
+            a_image_2.GetComponent<Image>().sprite = ability_sprites[0];
+        else if(current_ability_2.abilityName == "Dash")
+            a_image_2.GetComponent<Image>().sprite = ability_sprites[1];
+        else if(current_ability_2.abilityName == "Strong Attack")
+            a_image_2.GetComponent<Image>().sprite = ability_sprites[2];
+        else if(current_ability_2.abilityName == "Healing")
+            a_image_2.GetComponent<Image>().sprite = ability_sprites[3];
+        
+        if(current_ability_3.abilityName == "Stealth")
+            a_image_3.GetComponent<Image>().sprite = ability_sprites[0];
+        else if(current_ability_3.abilityName == "Dash")
+            a_image_3.GetComponent<Image>().sprite = ability_sprites[1];
+        else if(current_ability_3.abilityName == "Strong Attack")
+            a_image_3.GetComponent<Image>().sprite = ability_sprites[2];
+        else if(current_ability_3.abilityName == "Healing")
+            a_image_3.GetComponent<Image>().sprite = ability_sprites[3];
+        
+
     }
 
     void healingAction()
@@ -177,6 +212,7 @@ public class AbilityManager : MonoBehaviour
         //still a work in progress
     void strongAttackAction()
     {
+        
         StartCoroutine(strong());
     }
 
