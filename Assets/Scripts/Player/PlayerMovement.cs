@@ -430,20 +430,13 @@ public class PlayerMovement : MonoBehaviour
         if (controls.IsJumping && !ifIgnoreWallJump)
         {
             OnLeaveWall();
-            print("collider: " + Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f));
-            var a = Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f, wallChecker.LayerMask);
-            if (Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f).collider)
-            {
-                overrideMaxSpeed = wallJumpVelocity.x;
+            overrideMaxSpeed = wallJumpVelocity.x;
+
+            if (Physics2D.Raycast(wallChecker.transform.position, Vector2.left, 1f, wallChecker.LayerMask))
                 velocity = wallJumpVelocity;
-                print("move right");
-            }
             else
-            {
-                print("move left");
-                overrideMaxSpeed = -wallJumpVelocity.x;
                 velocity = new Vector2(-wallJumpVelocity.x, wallJumpVelocity.y);
-            }
+
             ifOverrideMaxSpeed = true;
             return;
         }
